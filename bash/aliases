@@ -4,11 +4,16 @@ alias ea='mate -w ~/dotfiles/bash/aliases && reload' # Edit aliases
 alias ee="mate ~/dotfiles/bash/env"
 alias sconf="mate ~/dotfiles/ssh/config"
 
+function unlock () {
+  /Developer/Tools/SetFile -c ""  -t "" "$1"
+}
+
+
+
 # Common -- Some are from Damian Conway
 alias a='ls -A' # -A all except literal . ..
 alias la="ls -A -l -G"
 alias c='clear'
-alias cdd='cd -'  # goto last dir cd'ed from
 alias cl='clear; l'
 function cdc() { 
     cd $1; ls 
@@ -118,17 +123,17 @@ function __rm_single_file(){
 
 # Chip's Stuff...
 alias mate='open -a /Applications/TextMate.app/'
-
 alias sites='cd /users/chayner/Sites/'
-
 alias irc='ssh -f -N -L 12345:localhost:6667 chayner@monet.centresource.com -p5344'
 
 # Websites
 alias hosting='ssh hosting2.centresource.com -p 5344'
 alias monet='ssh -p 5344 monet.centresource.com'
-alias stg='ssh -p5344 staging.centresource.com'
+alias stg='ssh staging'
 
 alias mii='cd /Users/chayner/Sites/miiroutine'
+
+alias sotldev='mate /users/chayner/Sites/drupal/sotl_full/sites/all/themes/sotl /users/chayner/Sites/drupal/sotl_full/sites/all/modules/custom'
 
 # Subversion
 alias svnext='svn propedit svn:externals'
@@ -140,13 +145,33 @@ alias s='./symfony'
 alias sfix='sudo ./symfony project:permissions'
 alias sbuild='./symfony doctrine:build --all --and-load'
 
-# Drush
-#alias drush='php /users/chayner/Sites/drupal/drush/drush.php'
+# Drupal and Drush aliases.
+# To be added at the end of .bashrc.
+alias drsp='cp sites/default/default.settings.php sites/default/settings.php'
+alias drcc='drush cache-clear all'
+alias drdb='drush updb && drush cc all'
+alias drdu='drush sql-dump --ordered-dump --result-file=dump.sql'
+alias dren='drush pm-enable'
+alias drdis='drush pm-disable'
+alias drf='drush features'
+alias drfd='drush features-diff'
+alias drfu='drush -y features-update'
+alias drfr='drush -y features-revert'
+alias drfra='drush -y features-revert all'
+alias dr='drush'
+
+function drmate()
+{
+  mate modules/custom themes/$1
+}
 
 # MySQL Items
 alias my='mysql -u chayner -pchiphayner'
 alias ma='mysqladmin5 -u chayner -pchiphayner'
-alias startsql='sudo mysqld_safe'
+# alias startsql='sudo mysqld_safe'
+alias mysqlstart='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper start'
+alias mysqlstop='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wrapper stop'
+
 
 # Apache Items
 alias conf='mate /opt/local/apache2/conf/httpd.conf /etc/hosts ~/dotfiles'
