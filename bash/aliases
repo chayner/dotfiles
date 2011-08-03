@@ -174,6 +174,6 @@ alias mysqlstop='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wr
 
 
 # Apache Items
-alias conf='mate /opt/local/apache2/conf/httpd.conf /etc/hosts ~/dotfiles'
+alias conf='mate /etc/apache2/httpd.conf /etc/hosts ~/dotfiles'
 alias alog='tail -f /opt/local/apache2/logs/error_log'
 alias arestart='sudo apachectl restart'
