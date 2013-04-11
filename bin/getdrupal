@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# $Id$
+#
+# This script is a simple wrapper that will run Drush with the most appropriate
+# php executable it can find.
+#
+
+#
+# REQUIRES drush and drush_make
+#
+
+if [ $# -lt 1 ]; then
+	echo "Usage: " `basename $0` "PROJECT_NAME"
+	exit 127
+	else
+	projectname=$1
+fi
+
+BASEDIR=`dirname $0`
+
+DB_NAME="local_$projectname"
+
+mkdir $projectname;
+cd $projectname
+
+default="$(whoami)"
+
+read -p "DB Username (default is $default):" -e t1
+if [ -n "$t1" ]
+then 
+  db_user="$t1"
+else
+  db_user="$default"
+fi
+
+echo -n "DB Password: "
+stty -echo
+read db_password
+stty echo
+echo ""
+
+read -p "SVN Username (default is $default):" -e t3
+if [ -n "$t3" ]
+then 
+  SVNUSER="$t3"
+else
+  SVNUSER="$default"
+fi
+
+echo -n "SVN Password: "
+stty -echo
+read SVNPASS
+stty echo
+echo ""
+
+# Grab the make file from the SVN server
+svn export --username $SVNUSER --password $SVNPASS http://svn.centresource.com/cs_tools/getdrupal/centresource.make;
+
+# Download all of the appropriate files to the current directory
+drush make ./centresource.make;
+
+rm ./centresource.make;
+
+# Create the files and themes directories
+mkdir sites/default/files;
+chmod 777 sites/default/files;
+chmod 777 sites/all/themes;
+
+# Symlink in the jQuery Cycle Library
+ln -s ../../../../sites/all/libraries/jquery_cycle/jquery.cycle.all.js sites/all/modules/views_cycle/jquery.cycle.js
+
+# Download jQuery Tools
+mkdir sites/all/libraries/jquery_tools;
+wget 'http://cdn.jquerytools.org/1.2.4/all/jquery.tools.min.js' -O "sites/all/libraries/jquery_tools/jquery.tools.min.js"
+
+# Grab the CS Install profile from the SVN server
+svn export --username $SVNUSER --password $SVNPASS http://svn.centresource.com/cs_tools/getdrupal/centresource ./profiles/centresource;
+
+# Update the settings.php with the DB username and password
+sed "s/username:password@localhost\/databasename/$db_user:$db_password@localhost\/$DB_NAME/" sites/default/default.settings.php > sites/default/settings.php;
+mysqladmin -u $db_user -p$db_password create $DB_NAME;
+
+# Grab the CS Cookbook from the SVN server
+# svn export --username $SVNUSER --password $SVNPASS http://svn.centresource.com/cs_cookbook/trunk sites/all/modules/cs_cookbook;
+
+# TODO: figure out how to hit install.php from the command line before executing the below lines:
+
+echo "Created Drupal project $projectname. Please now complete install via the web interface, selection the 'CentreSource Install Profile'"

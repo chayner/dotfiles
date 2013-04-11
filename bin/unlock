@@ -1,0 +1,26 @@
+#! /bin/bash
+#
+# Simple file unlocking utility for Mac OS X
+#
+ARGS=1
+E_BADARGS=65
+
+function recursiveUnlock() {
+    pushd $1
+    for rdir in `ls -A`; do
+        if [ -d "${rdir}" ]; then
+            recurse ${rdir}
+        else
+            /Developer/Tools/SetFile -a l ${rdir}
+        fi
+    done
+    popd
+}
+
+if [ $# -ne "$ARGS" ]
+then
+    echo "Usage: `basename $0` starting-directory"
+    exit $E_BADARGS
+fi
+
+recursiveUnlock $1
