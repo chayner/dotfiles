@@ -3,20 +3,24 @@ alias reload='source ~/.bashrc'
 alias ea='mate -w ~/dotfiles/bash/aliases && reload' # Edit aliases
 alias ee="mate ~/dotfiles/bash/env"
 alias sconf="mate ~/dotfiles/ssh/config"
+alias log="~/dotfiles/bin/logtodayone.rb"
+alias st='git sourcetree'
+
+eval "$(hub alias -s)"
 
 function unlock () {
   /Developer/Tools/SetFile -c ""  -t "" "$1"
 }
 
-
+alias lessc='node /usr/local/lib/node_modules/less/bin/lessc'
 
 # Common -- Some are from Damian Conway
 alias a='ls -A' # -A all except literal . ..
 alias la="ls -A -l -G"
 alias c='clear'
 alias cl='clear; l'
-function cdc() { 
-    cd $1; ls 
+function cdc() {
+    cd $1; ls
 }
 alias cls='clear; ls'
 alias h='history'
@@ -27,11 +31,10 @@ alias lh="ls -lh"
 alias ll='ls -lhG'  # -l long listing, human readable, no group info
 alias lt='ls -lt' # sort with recently modified first
 alias md='mkdir -p'
-alias s='cd ..'   # up one dir
 
-function take() { 
+function take() {
     mkdir -p "$1"
-    cd "$1" 
+    cd "$1"
 }
 
 # Finder
@@ -45,7 +48,7 @@ alias gba='git branch -a'
 alias gc='git commit -v'
 alias gca='git commit -v -a'
 # Commit pending changes and quote all args as message
-function gg() { 
+function gg() {
     git commit -v -a -m "$*"
 }
 alias gco='git checkout'
@@ -64,13 +67,13 @@ function gch() {
 }
 
 # Setup a tracking branch from [remote] [branch_name]
-function gbt() { 
-  git branch --track $2 $1/$2 && git checkout $2 
+function gbt() {
+  git branch --track $2 $1/$2 && git checkout $2
 }
 # Quickly clobber a file and checkout
-function grf() { 
+function grf() {
   rm $1
-  git checkout $1 
+  git checkout $1
 }
 # Call from inside an initialized Git repo, with the name of the repo.
 function new-git() {
@@ -159,10 +162,14 @@ alias drfu='drush -y features-update'
 alias drfr='drush -y features-revert'
 alias drfra='drush -y features-revert all'
 alias dr='drush'
+alias csson="drush -y vset preprocess_css 1"
+alias cssoff="drush -y vset preprocess_css 0"
+alias json="drush -y vset preprocess_js 1"
+alias jsoff="drush -y vset preprocess_js 0"
 
-function drmate()
+function drsubl()
 {
-  mate modules/custom themes/$1
+  subl modules/custom themes/$1
 }
 
 # MySQL Items
@@ -174,6 +181,6 @@ alias mysqlstop='sudo /opt/local/etc/LaunchDaemons/org.macports.mysql5/mysql5.wr
 
 
 # Apache Items
-alias conf='mate /etc/apache2/httpd.conf /etc/hosts ~/dotfiles'
+alias conf='subl /etc/apache2/extra/httpd-vhosts.conf /etc/hosts ~/dotfiles'
 alias alog='tail -f /opt/local/apache2/logs/error_log'
 alias arestart='sudo apachectl restart'

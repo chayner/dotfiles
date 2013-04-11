@@ -1,7 +1,15 @@
-export PATH=/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/apache2/bin:/usr/share/bin/:/Users/chayner/dotfiles/bin:/usr/local/mysql/bin:~/.gem:$PATH
+export PATH=/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/apache2/bin:/usr/share/bin:/usr/local/mysql/bin:/usr/local/pear/bin:~/.drush:~/.gem:~/dotfiles/bin:$PATH
 export PHP_PEAR_PHP_BIN=/usr/bin/php
-export SVN_EDITOR='mate -w'
-export EDITOR="mate -w"
+# export SVN_EDITOR='mate -w'
+# export EDITOR="mate -w"
+export SVN_EDITOR='subl -w'
+export EDITOR='subl -w'
+export CC=/usr/bin/gcc
+export NODE_PATH=/usr/local/lib/node_modules
+
+export AWS_ACCESS_KEY_ID=0VX2MJ3XF7MQW2ADN482
+export AWS_SECRET_ACCESS_KEY=wU4P+hsy1dBb15OWK09CZLt/StIOgQCJ9VytK7N8
+export S3_BUCKET_NAME=emi-spotify-assets
 
 [[ -s "/Users/chayner/.rvm/scripts/rvm" ]] && source "/Users/chayner/.rvm/scripts/rvm"  # This loads RVM into a shell session.
 
@@ -13,7 +21,7 @@ _drupal_root() {
   # Go up until we find index.php
   current_dir=`pwd`;
   while [ ${current_dir} != "/" -a -d "${current_dir}" -a \
-          ! -f "${current_dir}/index.php" ] ; 
+          ! -f "${current_dir}/index.php" ] ;
   do
     current_dir=$(dirname "${current_dir}") ;
   done
@@ -21,7 +29,7 @@ _drupal_root() {
     exit 1 ;
   else
     echo "$current_dir" ;
-  fi 
+  fi
 }
 
 _drupal_modules_in_dir()
