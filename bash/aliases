@@ -148,6 +148,9 @@ alias s='./symfony'
 alias sfix='sudo ./symfony project:permissions'
 alias sbuild='./symfony doctrine:build --all --and-load'
 
+# PHP Composer
+alias com='php ~/composer.phar'
+
 # Drupal and Drush aliases.
 # To be added at the end of .bashrc.
 alias drsp='cp sites/default/default.settings.php sites/default/settings.php'
@@ -169,7 +172,7 @@ alias jsoff="drush -y vset preprocess_js 0"
 
 function drsubl()
 {
-  subl modules/custom themes/$1
+  subl modules/custom modules/_custom themes/$1
 }
 
 # MySQL Items

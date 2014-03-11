@@ -1,11 +1,11 @@
-export PATH=/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/apache2/bin:/usr/share/bin:/usr/local/mysql/bin:/usr/local/pear/bin:~/.drush:~/.gem:~/dotfiles/bin:$PATH
+export PATH=/opt/local/sbin:/usr/local/bin:/usr/local/sbin:/opt/local/bin:/opt/local/apache2/bin:/usr/share/bin:/usr/local/share/npm/bin:/usr/local/mysql/bin:/usr/local/pear/bin:~/.drush:~/.gem:~/dotfiles/bin:~/pebble-dev/PebbleSDK-2.0-BETA5/bin:$PATH
 export PHP_PEAR_PHP_BIN=/usr/bin/php
 # export SVN_EDITOR='mate -w'
 # export EDITOR="mate -w"
 export SVN_EDITOR='subl -w'
 export EDITOR='subl -w'
 export CC=/usr/bin/gcc
-export NODE_PATH=/usr/local/lib/node_modules
+export NODE_PATH=/usr/local/share/npm/lib/node_modules
 
 export AWS_ACCESS_KEY_ID=0VX2MJ3XF7MQW2ADN482
 export AWS_SECRET_ACCESS_KEY=wU4P+hsy1dBb15OWK09CZLt/StIOgQCJ9VytK7N8
@@ -76,3 +76,46 @@ complete -F _drupal_features drfr
 complete -F _drupal_features drfu
 complete -F _drupal_features drfd
 complete -F _drupal_modules cdd
+
+function spinup {
+  # drush make
+  cd ~/Sites/drupal
+  drush make csbase2.make $*
+
+  # drush site install
+  cd $*
+  drush si d7_csbase_profile --db-url=mysql://chayner:chiphayner@localhost/$* --account-name=admin --account-pass=CsO13! --account-mail=chayner@centresource.com -y
+
+  # theme
+  drush mothership "Mothership subtheme" $* --site-name=all
+  cd sites/all/themes/$*
+  rm -rf css
+  rm -rf js
+  git clone git@github.com:micahredding/assets.git
+  cd assets
+  rm -rf .git
+  rm -rf .gitignore
+  cd scss
+  bourbon install
+  neat install
+  cd ../..
+  cd ../../../..
+
+  # ehosts
+  sudo -v
+  sudo chmod 777 /etc/hosts
+  sudo echo "     " >> /etc/hosts
+  sudo echo "127.0.0.1 $*.dev " >> /etc/hosts
+  sudo chmod 644 /etc/hosts
+
+  # vhosts
+  sudo chmod 777 /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo echo "     "                                 >> /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo echo "<VirtualHost *:80>"                    >> /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo echo "DocumentRoot '/Users/chayner/Sites/drupal/$*' "  >> /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo echo "ServerName $*.dev"                     >> /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo echo "</VirtualHost>"                        >> /private/etc/apache2/extra/httpd-vhosts.conf
+  sudo chmod 644 /private/etc/apache2/extra/httpd-vhosts.conf
+
+  sudo apachectl restart
+}
