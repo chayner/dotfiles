@@ -40,8 +40,12 @@ BWHITE='\e[47m'
 
 # Update the command prompt to be <user>:<current_directory>(git_branch) >
 # Note that the git branch is given a special color
-PS1="\n\n\[$EGREEN\]\H \[$EWHITE\]>\[$EMAGENTA\] \u\[$EWHITE\]:\[$EBLUE\]\w \[$ERED\]\$(vcprompt)\[$NO_COLOR\] \n→ "
+PS1="\n\n\[$EGREEN\]\u@\H\[$WHITE\]:\[$MAGENTA\]\$(prompt_rvm) \[$EWHITE\]> \[$EBLUE\]\w \[$RED\]\$(vcprompt) \[$NO_COLOR\] \n→ "
 
 # colorize
 export CLICOLOR=1
 export LSCOLORS=ExFxCxDxCxegedabagacAh
+
+# prompt title
+PROMPT_TITLE='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+export PROMPT_COMMAND="${PROMPT_COMMAND} ${PROMPT_TITLE}; "

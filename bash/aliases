@@ -61,6 +61,8 @@ alias gst='git status'
 alias gt='git status'
 alias g='git status'
 alias eg='mate .git/config'
+alias gmt='git mergetool -t opendiff'
+
 # Git clone from GitHub
 function gch() {
   git clone git://github.com/$USER/$1.git

@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+# $Id$
+#
+# This script is a simple wrapper that will run Drush with the most appropriate
+# php executable it can find.
+#
+
+blue='\e[34m'
+NC='\e[0m' # No Color
+
+#
+# REQUIRES drush and drush_make
+#
+
+if [ $# -lt 1 ]; then
+  echo "Usage: " `basename $0` "PROJECT_NAME"
+  exit 127
+else
+  projectname=$1
+fi
+
+# Get location of the csbase.make file
+default_make="$HOME/Sites/drupal"
+
+read -p "Location of csbase.make (default is $default_make):" -e t1
+if [ -n "$t1" ]
+then
+  make_path="$t1"
+else
+  make_path="$default_make"
+fi
+
+
+# Get DB Username / Password
+default="$(whoami)"
+
+read -p "DB Username (default is $default):" -e t1
+if [ -n "$t1" ]
+then
+  db_user="$t1"
+else
+  db_user="$default"
+fi
+
+echo -n "DB Password: "
+stty -echo
+read db_password
+stty echo
+echo ""
+
+
+# vhosts
+default_vhosts=/etc/apache2/extra/httpd-vhosts.conf
+read -p "vhosts file to edit: (default is $default_vhosts):" -e t1
+if [ -n "$t1" ]
+then
+  vhosts_path="$t1"
+else
+  vhosts_path="$default_vhosts"
+fi
+
+
+# Run drush make
+echo " "
+echo "==============================================================="
+echo "Running Drush Make..."
+echo "==============================================================="
+echo "  "
+drush make --no-cache $make_path/csbase.make $projectname
+
+echo "                                                 "
+echo "==============================================================="
+echo "Installing Site..."
+echo "==============================================================="
+echo "                                                 "
+
+# Run drush site install
+cd $projectname
+projectpath="$(pwd)"
+
+drush si d7_csbase_profile --db-url=mysql://$db_user:$db_password@127.0.0.1/$projectname --account-name=admin --account-pass=CsO14! --account-mail=admin@centresource.com -y
+chmod -R 777 sites/default/files/
+
+
+# theme
+echo "                                                 "
+echo "==============================================================="
+echo "Updating Theme Settings..."
+echo "==============================================================="
+echo "                                                 "
+
+drush mothership "$projectname - a mothership subtheme" $projectname --site-name=all
+cd sites/all/themes/$projectname
+rm -rf css
+rm -rf js
+git clone git@github.com:centresource/d7_assets.git assets
+cd assets
+rm -rf .git
+cd ../
+mkdir templates
+mv page.tpl.php ./templates/
+mv node.tpl.php ./templates/
+cp ../../../../profiles/d7_csbase_profile/themes/mothership/mothership/templates/html.tpl.php ./templates
+rm apple-startup.png
+rm apple-touch-icon-114x114.png
+rm apple-touch-icon-144x144\ 2.png
+rm apple-touch-icon-72x72.png
+rm apple-touch-icon.png
+rm favicon.ico
+rm logo.png
+
+# Remove the Appletouch Icon reference in Mothership HTML template
+sed "s/\<\?php print \$appletouchicon\; \?\>/ /" templates/html.tpl.php > templates/html.tpl.php.tmp;
+mv templates/html.tpl.php.tmp templates/html.tpl.php
+
+# Change the CSS and JS reference in the info file to be the correct files
+sed "s/\css\/style.css/\assets\/css\/screen.css/" $projectname.info > $projectname.info.tmp;
+sed "s/\js\/script.js/\assets\/js\/application.js/" $projectname.info.tmp > $projectname.info;
+rm $projectname.info.tmp
+
+
+echo "                                                 "
+echo "==============================================================="
+echo "Installing Bourbon / Neat..."
+echo "==============================================================="
+echo "                                                 "
+
+cd assets/_scss
+bourbon install
+neat install
+
+
+echo "                                                 "
+echo "==============================================================="
+echo "Installing Node Modules..."
+echo "==============================================================="
+echo "                                                 "
+
+cd ../
+npm install
+cd ../../../..
+
+
+echo "                                                 "
+echo "==============================================================="
+echo "Enabling Theme..."
+echo "==============================================================="
+echo "                                                 "
+
+drush en $projectname -y
+drush vset theme_default $projectname
+php -r "print json_encode(array('default_logo' => '0'));" | drush vset theme_${projectname}_settings --format=json - -q
+
+echo "                                                 "
+echo "==============================================================="
+echo "Final Drupal Prep..."
+echo "==============================================================="
+echo "                                                 "
+
+drush fr d7_base_feature -y
+drush fr d7_base_wysiwyg -y
+drush up drupal -y
+mv $projectpath/sites/all/themes/$projectname/assets/.gitignore $projectpath/
+
+
+# hosts / vhosts
+echo "                                                 "
+echo "==============================================================="
+echo "Updating hosts / vhosts configuration..."
+echo "==============================================================="
+echo "                                                 "
+
+sudo -v
+sudo chmod 777 /etc/hosts
+sudo echo "     " >> /etc/hosts
+sudo echo "127.0.0.1 $projectname.dev " >> /etc/hosts
+sudo chmod 644 /etc/hosts
+
+sudo chmod 777 $vhosts_path
+sudo echo "     "                                 >> $vhosts_path
+sudo echo "<VirtualHost *:80>"                    >> $vhosts_path
+sudo echo "  ServerName $projectname.dev"                     >> $vhosts_path
+sudo echo "  ServerAlias $projectname.*.xip.io"                     >> $vhosts_path
+sudo echo "  DocumentRoot '$projectpath' "  >> $vhosts_path
+sudo echo "  DirectoryIndex index.php"                    >> $vhosts_path
+sudo echo "  <Directory '$projectpath'>"                    >> $vhosts_path
+sudo echo "    Options FollowSymLinks MultiViews Includes"                    >> $vhosts_path
+sudo echo "    AllowOverride All"                    >> $vhosts_path
+sudo echo "    Order allow,deny"                    >> $vhosts_path
+sudo echo "    Allow from all"                    >> $vhosts_path
+sudo echo "  </Directory>"                    >> $vhosts_path
+sudo echo "</VirtualHost>"                        >> $vhosts_path
+sudo chmod 644 $vhosts_path
+
+sudo apachectl restart
+
+echo "  "
+echo "Successfully created Drupal project $projectname."
