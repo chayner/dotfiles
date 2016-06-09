@@ -1,0 +1,41 @@
+"*":
+  "atom-beautify":
+    _analyticsUserId: "ae4e548a-dd32-4776-8759-70009090d2f0"
+  "autocomplete-plus": {}
+  core:
+    themes: [
+      "itg-flat-dark"
+      "monokai-shade"
+    ]
+  editor:
+    invisibles: {}
+    lineHeight: 1.4
+    preferredLineLength: 120
+    scrollPastEnd: true
+    showIndentGuide: true
+  "exception-reporting":
+    userId: "f7f87f7b-ad12-6cce-4421-6a1d99342989"
+  "file-icons":
+    onChanges: true
+  "git-plus": {}
+  "markdown-preview": {}
+  "markdown-writer":
+    siteEngine: "html"
+    siteLocalDir: "/Users/chip.hayner/Sites/documentation"
+    sitePostsDir: "_posts/"
+  minimap: {}
+  "one-dark-ui": {}
+  pigments:
+    mergeColorDuplicates: true
+    sortPaletteColors: "by color"
+  "ruby-test": {}
+  tabs:
+    enableVcsColoring: true
+    usePreviewTabs: true
+  "tree-view":
+    hideVcsIgnoredFiles: true
+  welcome:
+    showOnStartup: false
+".diff.source":
+  editor:
+    preferredLineLength: 120
